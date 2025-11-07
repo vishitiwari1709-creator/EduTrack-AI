@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTrack | Live Demo - AI Student Tracking System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --accent: #1abc9c;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --success: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header & Navigation */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--secondary);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .cta-button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .cta-button:hover {
+            background-color: #2980b9;
+        }
+        
+        .logout-btn {
+            background-color: transparent;
+            color: var(--dark);
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background-color: #f8f9fa;
+            border-color: #ccc;
+        }
+        
+        /* Login Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .modal-header h2 {
+            margin-bottom: 5px;
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--secondary);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .login-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .login-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .login-tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .login-form {
+            display: none;
+        }
+        
+        .login-form.active {
+            display: block;
+        }
+        
+        .demo-credentials {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .demo-credentials h4 {
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+        
+        .demo-credentials ul {
+            list-style: none;
+        }
+        
+        .demo-credentials li {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .demo-credentials i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 150px 0 100px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #16a085;
+        }
+        
+        .btn-outline {
+            border: 2px solid white;
+            color: white;
+            background: transparent;
+        }
+        
+        .btn-outline:hover {
+            background-color: white;
+            color: var(--primary);
+        }
+        
+        /* Dashboard Section */
+        .dashboard-section {
+            padding: 80px 0;
+            background-color: white;
+        }
+        
+        .dashboard-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab-btn {
+            padding: 12px 25px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: var(--light);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .charts-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+        
+        .chart-card h3 {
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+        
+        .students-list {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+        
+        .students-list h3 {
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+        
+        .student-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .student-item:last-child {
+            border-bottom: none;
+        }
+        
+        .student-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 15px;
+        }
+        
+        .student-info {
+            flex: 1;
+        }
+        
+        .student-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .student-status {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .attendance-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-present {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+        
+        .badge-absent {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--danger);
+        }
+        
+        .badge-late {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: var(--warning);
+        }
+        
+        /* Face Recognition Demo */
+        .demo-section {
+            padding: 80px 0;
+            background-color: var(--light);
+        }
+        
+        .demo-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+        
+        .camera-feed {
+            background-color: var(--dark);
+            border-radius: 8px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .recognition-result {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .recognition-result h3 {
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+        
+        .student-details {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .student-details .student-avatar {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            margin-right: 20px;
+        }
+        
+        .attendance-log {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .log-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .log-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* Features Section */
+        .features-section {
+            padding: 80px 0;
+            background-color: white;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            text-align: center;
+            padding: 100px 0;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .cta-section p {
+            max-width: 700px;
+            margin: 0 auto 30px;
+            font-size: 1.1rem;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--secondary);
+            color: white;
+            padding: 70px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: #bbb;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #444;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+        
+        /* Login Required Message */
+        .login-required {
+            text-align: center;
+            padding: 60px 0;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin: 20px 0;
+        }
+        
+        .login-required i {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .login-required h3 {
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+        
+        .login-required p {
+            margin-bottom: 25px;
+            color: #666;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 15px 0;
+            }
+            
+            .nav-links {
+                margin-top: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-links li {
+                margin: 5px 10px;
+            }
+            
+            .user-section {
+                margin-top: 15px;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .demo-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 250px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>EduTrack</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#dashboard">Dashboard</a></li>
+                    <li><a href="#demo">Face Recognition</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#technology">Technology</a></li>
+                </ul>
+                <div class="user-section" id="user-section">
+                    <button class="cta-button" id="login-btn">Login</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Login Modal -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Welcome to EduTrack</h2>
+                <p>Please login to continue</p>
+            </div>
+            <div class="modal-body">
+                <div class="login-tabs">
+                    <button class="login-tab active" data-tab="teacher">Teacher Login</button>
+                    <button class="login-tab" data-tab="student">Student Login</button>
+                    <button class="login-tab" data-tab="admin">Admin Login</button>
+                </div>
+                
+                <!-- Teacher Login Form -->
+                <div id="teacher-login" class="login-form active">
+                    <div class="form-group">
+                        <label for="teacher-username">Username</label>
+                        <input type="text" id="teacher-username" class="form-control" placeholder="Enter your username">
+                    </div>
+                    <div class="form-group">
+                        <label for="teacher-password">Password</label>
+                        <input type="password" id="teacher-password" class="form-control" placeholder="Enter your password">
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%;" onclick="login('teacher')">Login as Teacher</button>
+                    
+                    <div class="demo-credentials">
+                        <h4>Demo Credentials:</h4>
+                        <ul>
+                            <li><i class="fas fa-user"></i> Username: <strong>teacher</strong></li>
+                            <li><i class="fas fa-lock"></i> Password: <strong>teacher123</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Student Login Form -->
+                <div id="student-login" class="login-form">
+                    <div class="form-group">
+                        <label for="student-username">Username</label>
+                        <input type="text" id="student-username" class="form-control" placeholder="Enter your username">
+                    </div>
+                    <div class="form-group">
+                        <label for="student-password">Password</label>
+                        <input type="password" id="student-password" class="form-control" placeholder="Enter your password">
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%;" onclick="login('student')">Login as Student</button>
+                    
+                    <div class="demo-credentials">
+                        <h4>Demo Credentials:</h4>
+                        <ul>
+                            <li><i class="fas fa-user"></i> Username: <strong>student</strong></li>
+                            <li><i class="fas fa-lock"></i> Password: <strong>student123</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Admin Login Form -->
+                <div id="admin-login" class="login-form">
+                    <div class="form-group">
+                        <label for="admin-username">Username</label>
+                        <input type="text" id="admin-username" class="form-control" placeholder="Enter your username">
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-password">Password</label>
+                        <input type="password" id="admin-password" class="form-control" placeholder="Enter your password">
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%;" onclick="login('admin')">Login as Admin</button>
+                    
+                    <div class="demo-credentials">
+                        <h4>Demo Credentials:</h4>
+                        <ul>
+                            <li><i class="fas fa-user"></i> Username: <strong>admin</strong></li>
+                            <li><i class="fas fa-lock"></i> Password: <strong>admin123</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>AI-Powered Student Tracking System</h1>
+            <p>Experience our live demo: Automated attendance, learning analytics, and real-time insights in one platform.</p>
+            <div class="hero-buttons">
+                <a href="#dashboard" class="btn btn-primary">Try Dashboard</a>
+                <a href="#demo" class="btn btn-outline">Test Face Recognition</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Dashboard -->
+    <section id="dashboard" class="dashboard-section">
+        <div class="container">
+            <!-- Login Required Message (shown when not logged in) -->
+            <div id="login-required" class="login-required">
+                <i class="fas fa-lock"></i>
+                <h3>Authentication Required</h3>
+                <p>Please log in to access the EduTrack dashboard and all interactive features.</p>
+                <button class="btn btn-primary" onclick="openLoginModal()">Login Now</button>
+            </div>
+            
+            <!-- Dashboard Content (shown when logged in) -->
+            <div id="dashboard-content" style="display: none;">
+                <div class="dashboard-tabs">
+                    <button class="tab-btn active" data-tab="teacher">Teacher Dashboard</button>
+                    <button class="tab-btn" data-tab="student">Student Dashboard</button>
+                    <button class="tab-btn" data-tab="admin">Admin Panel</button>
+                </div>
+                
+                <!-- Teacher Dashboard -->
+                <div id="teacher-tab" class="tab-content active">
+                    <div class="dashboard-header">
+                        <h2>Teacher Dashboard</h2>
+                        <div class="date-selector">
+                            <select id="time-period">
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month" selected>This Month</option>
+                                <option value="semester">This Semester</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="attendance-rate">94%</div>
+                            <div class="stat-label">Overall Attendance</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="total-students">42</div>
+                            <div class="stat-label">Total Students</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="at-risk">3</div>
+                            <div class="stat-label">At-Risk Students</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="avg-performance">78%</div>
+                            <div class="stat-label">Avg. Performance</div>
+                        </div>
+                    </div>
+                    
+                    <div class="charts-container">
+                        <div class="chart-card">
+                            <h3>Attendance Trend</h3>
+                            <canvas id="attendanceChart" height="250"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Performance Distribution</h3>
+                            <canvas id="performanceChart" height="250"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="students-list">
+                        <h3>Student Attendance Today</h3>
+                        <div class="student-item">
+                            <div class="student-avatar">JD</div>
+                            <div class="student-info">
+                                <div class="student-name">John Davis</div>
+                                <div class="student-status">Computer Science</div>
+                            </div>
+                            <div class="attendance-badge badge-present">Present</div>
+                        </div>
+                        <div class="student-item">
+                            <div class="student-avatar">SM</div>
+                            <div class="student-info">
+                                <div class="student-name">Sarah Miller</div>
+                                <div class="student-status">Mathematics</div>
+                            </div>
+                            <div class="attendance-badge badge-present">Present</div>
+                        </div>
+                        <div class="student-item">
+                            <div class="student-avatar">RJ</div>
+                            <div class="student-info">
+                                <div class="student-name">Robert Johnson</div>
+                                <div class="student-status">Physics</div>
+                            </div>
+                            <div class="attendance-badge badge-late">Late</div>
+                        </div>
+                        <div class="student-item">
+                            <div class="student-avatar">EW</div>
+                            <div class="student-info">
+                                <div class="student-name">Emma Wilson</div>
+                                <div class="student-status">Biology</div>
+                            </div>
+                            <div class="attendance-badge badge-absent">Absent</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Student Dashboard -->
+                <div id="student-tab" class="tab-content">
+                    <div class="dashboard-header">
+                        <h2>Student Dashboard</h2>
+                        <div class="student-info-header">
+                            <div class="student-avatar">JD</div>
+                            <div>
+                                <h3>John Davis</h3>
+                                <p>Computer Science - Semester 4</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">92%</div>
+                            <div class="stat-label">Your Attendance</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">85%</div>
+                            <div class="stat-label">Avg. Score</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Assignments Done</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Pending Tasks</div>
+                        </div>
+                    </div>
+                    
+                    <div class="charts-container">
+                        <div class="chart-card">
+                            <h3>Your Performance Trend</h3>
+                            <canvas id="studentPerformanceChart" height="250"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Subject-wise Scores</h3>
+                            <canvas id="subjectChart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Admin Dashboard -->
+                <div id="admin-tab" class="tab-content">
+                    <div class="dashboard-header">
+                        <h2>Admin Panel</h2>
+                        <div class="date-selector">
+                            <select id="admin-time-period">
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month" selected>This Month</option>
+                                <option value="semester">This Semester</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">5</div>
+                            <div class="stat-label">Active Classes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">18</div>
+                            <div class="stat-label">Teaching Staff</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">94%</div>
+                            <div class="stat-label">System Accuracy</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">100%</div>
+                            <div class="stat-label">Uptime</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3>Institution Overview</h3>
+                        <canvas id="institutionChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Face Recognition Demo -->
+    <section id="demo" class="demo-section">
+        <div class="container">
+            <h2 class="section-title">AI Face Recognition Demo</h2>
+            <p class="section-subtitle" style="text-align: center; margin-bottom: 40px; max-width: 700px; margin-left: auto; margin-right: auto;">
+                Experience our AI-powered attendance system. The system automatically detects and recognizes students for attendance marking.
+            </p>
+            
+            <!-- Login Required for Demo -->
+            <div id="demo-login-required" class="login-required">
+                <i class="fas fa-camera"></i>
+                <h3>Authentication Required</h3>
+                <p>Please log in to access the face recognition demo and interactive features.</p>
+                <button class="btn btn-primary" onclick="openLoginModal()">Login Now</button>
+            </div>
+            
+            <!-- Demo Content (shown when logged in) -->
+            <div id="demo-content" style="display: none;">
+                <div class="demo-container">
+                    <div class="camera-feed">
+                        <div id="camera-placeholder">
+                            <i class="fas fa-camera" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                            <p>Camera Feed Simulation</p>
+                            <p class="demo-note">In a real implementation, this would show live camera feed</p>
+                        </div>
+                    </div>
+                    
+                    <div class="recognition-result">
+                        <h3>Recognition Results</h3>
+                        
+                        <div class="student-details">
+                            <div class="student-avatar">JD</div>
+                            <div>
+                                <h4>John Davis</h4>
+                                <p>ID: STU2023001 | Computer Science</p>
+                            </div>
+                        </div>
+                        
+                        <div class="attendance-action">
+                            <button id="mark-attendance" class="btn btn-primary" style="width: 100%;">Mark Attendance</button>
+                        </div>
+                        
+                        <div class="attendance-log">
+                            <h4 style="margin: 20px 0 10px;">Recent Attendance Log</h4>
+                            <div class="log-item">
+                                <span>Sarah Miller</span>
+                                <span class="badge-present">Present</span>
+                            </div>
+                            <div class="log-item">
+                                <span>Michael Brown</span>
+                                <span class="badge-present">Present</span>
+                            </div>
+                            <div class="log-item">
+                                <span>Robert Johnson</span>
+                                <span class="badge-late">Late</span>
+                            </div>
+                            <div class="log-item">
+                                <span>Emma Wilson</span>
+                                <span class="badge-absent">Absent</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <h2 class="section-title">Key Features</h2>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <h3>Automated Attendance</h3>
+                    <p>AI-based face recognition or QR-code scanning to mark attendance automatically, eliminating manual entry and preventing proxy attendance.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Learning Analytics</h3>
+                    <p>Track student engagement on digital platforms including assignment completion, quiz scores, and participation in learning sessions.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h3>Real-time Dashboard</h3>
+                    <p>Interactive dashboards for teachers, students, and administrators with real-time data visualization and reporting.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>Smart Alerts</h3>
+                    <p>Automated notifications for low attendance, declining performance, or other at-risk indicators sent to students, parents, and teachers.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Transform Your Educational Institution?</h2>
+            <p>Join hundreds of schools and universities already using EduTrack to improve attendance accuracy, reduce administrative workload, and enhance student outcomes.</p>
+            <a href="#" class="btn btn-primary">Request a Live Demo</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>EduTrack</h3>
+                    <p>AI-powered student attendance and learning tracking system for modern educational institutions.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#dashboard">Dashboard</a></li>
+                        <li><a href="#demo">Face Recognition</a></li>
+                        <li><a href="#features">Features</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Technology</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">React.js Frontend</a></li>
+                        <li><a href="#">Python Backend</a></li>
+                        <li><a href="#">AI Face Recognition</a></li>
+                        <li><a href="#">Cloud Infrastructure</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-envelope"></i> info@edutrack.com</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 EduTrack. All rights reserved. | Interactive Demo</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // User state
+        let currentUser = null;
+        
+        // Demo credentials
+        const credentials = {
+            teacher: { username: 'teacher', password: 'teacher123', name: 'Dr. Smith', role: 'teacher' },
+            student: { username: 'student', password: 'student123', name: 'John Davis', role: 'student' },
+            admin: { username: 'admin', password: 'admin123', name: 'Admin User', role: 'admin' }
+        };
+        
+        // DOM Elements
+        const loginModal = document.getElementById('login-modal');
+        const loginBtn = document.getElementById('login-btn');
+        const userSection = document.getElementById('user-section');
+        const loginRequired = document.getElementById('login-required');
+        const dashboardContent = document.getElementById('dashboard-content');
+        const demoLoginRequired = document.getElementById('demo-login-required');
+        const demoContent = document.getElementById('demo-content');
+        
+        // Open login modal
+        function openLoginModal() {
+            loginModal.style.display = 'flex';
+        }
+        
+        // Close login modal
+        function closeLoginModal() {
+            loginModal.style.display = 'none';
+            // Clear form fields
+            document.querySelectorAll('.form-control').forEach(input => {
+                input.value = '';
+            });
+        }
+        
+        // Login function
+        function login(role) {
+            const usernameInput = document.getElementById(`${role}-username`);
+            const passwordInput = document.getElementById(`${role}-password`);
+            
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+            
+            if (username === credentials[role].username && password === credentials[role].password) {
+                // Successful login
+                currentUser = credentials[role];
+                updateUIAfterLogin();
+                closeLoginModal();
+                
+                // Show success message
+                alert(`Successfully logged in as ${currentUser.name} (${currentUser.role})`);
+            } else {
+                // Failed login
+                alert('Invalid username or password. Please check the demo credentials and try again.');
+            }
+        }
+        
+        // Logout function
+        function logout() {
+            currentUser = null;
+            updateUIAfterLogout();
+            alert('You have been logged out successfully.');
+        }
+        
+        // Update UI after login
+        function updateUIAfterLogin() {
+            // Update header
+            loginBtn.style.display = 'none';
+            userSection.innerHTML = `
+                <div class="user-info">
+                    <div class="user-avatar">${currentUser.name.split(' ').map(n => n[0]).join('')}</div>
+                    <span>Welcome, ${currentUser.name}</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            `;
+            
+            // Show dashboard content
+            loginRequired.style.display = 'none';
+            dashboardContent.style.display = 'block';
+            
+            // Show demo content
+            demoLoginRequired.style.display = 'none';
+            demoContent.style.display = 'block';
+            
+            // Initialize charts if they don't exist
+            if (!window.chartsInitialized) {
+                initializeCharts();
+                window.chartsInitialized = true;
+            }
+            
+            // Set active tab based on user role
+            if (currentUser.role === 'student') {
+                document.querySelector('[data-tab="student"]').click();
+            } else if (currentUser.role === 'admin') {
+                document.querySelector('[data-tab="admin"]').click();
+            }
+        }
+        
+        // Update UI after logout
+        function updateUIAfterLogout() {
+            // Update header
+            userSection.innerHTML = '<button class="cta-button" id="login-btn">Login</button>';
+            document.getElementById('login-btn').addEventListener('click', openLoginModal);
+            
+            // Hide dashboard content
+            dashboardContent.style.display = 'none';
+            loginRequired.style.display = 'block';
+            
+            // Hide demo content
+            demoContent.style.display = 'none';
+            demoLoginRequired.style.display = 'block';
+        }
+        
+        // Initialize charts
+        function initializeCharts() {
+            // Attendance Trend Chart
+            const attendanceCtx = document.getElementById('attendanceChart').getContext('2d');
+            new Chart(attendanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                    datasets: [{
+                        label: 'Attendance Rate',
+                        data: [92, 88, 94, 96, 91, 95],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 80,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Performance Distribution Chart
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(performanceCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Excellent (90-100%)', 'Good (75-89%)', 'Average (60-74%)', 'Needs Improvement (<60%)'],
+                    datasets: [{
+                        data: [12, 20, 8, 2],
+                        backgroundColor: [
+                            '#2ecc71',
+                            '#3498db',
+                            '#f39c12',
+                            '#e74c3c'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            // Student Performance Chart
+            const studentPerformanceCtx = document.getElementById('studentPerformanceChart').getContext('2d');
+            new Chart(studentPerformanceCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Your Scores',
+                        data: [78, 82, 85, 80, 88, 90],
+                        backgroundColor: '#1abc9c'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Subject-wise Chart
+            const subjectCtx = document.getElementById('subjectChart').getContext('2d');
+            new Chart(subjectCtx, {
+                type: 'polarArea',
+                data: {
+                    labels: ['Mathematics', 'Computer Science', 'Physics', 'English', 'Chemistry'],
+                    datasets: [{
+                        data: [92, 88, 85, 78, 82],
+                        backgroundColor: [
+                            '#3498db',
+                            '#2ecc71',
+                            '#9b59b6',
+                            '#f39c12',
+                            '#1abc9c'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            // Institution Chart
+            const institutionCtx = document.getElementById('institutionChart').getContext('2d');
+            new Chart(institutionCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English'],
+                    datasets: [{
+                        label: 'Average Attendance',
+                        data: [94, 89, 92, 87, 90, 88],
+                        backgroundColor: '#3498db'
+                    }, {
+                        label: 'Average Performance',
+                        data: [82, 78, 75, 80, 77, 85],
+                        backgroundColor: '#1abc9c'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Login button
+            loginBtn.addEventListener('click', openLoginModal);
+            
+            // Login tabs
+            document.querySelectorAll('.login-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs and forms
+                    document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.login-form').forEach(f => f.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Show corresponding form
+                    const tabId = this.getAttribute('data-tab') + '-login';
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Dashboard tabs
+            document.querySelectorAll('.tab-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all tabs and contents
+                    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    button.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabId = button.getAttribute('data-tab') + '-tab';
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Mark Attendance Button
+            document.getElementById('mark-attendance').addEventListener('click', function() {
+                const button = this;
+                const originalText = button.textContent;
+                
+                button.textContent = 'Marking...';
+                button.disabled = true;
+                
+                setTimeout(function() {
+                    button.textContent = 'Attendance Marked!';
+                    button.style.backgroundColor = '#2ecc71';
+                    
+                    setTimeout(function() {
+                        button.textContent = originalText;
+                        button.disabled = false;
+                        button.style.backgroundColor = '';
+                    }, 2000);
+                }, 1500);
+            });
+            
+            // Time period selector
+            document.getElementById('time-period').addEventListener('change', function() {
+                const period = this.value;
+                const stats = {
+                    today: { attendance: 96, students: 42, atRisk: 2, performance: 82 },
+                    week: { attendance: 94, students: 42, atRisk: 3, performance: 80 },
+                    month: { attendance: 92, students: 42, atRisk: 3, performance: 78 },
+                    semester: { attendance: 90, students: 42, atRisk: 5, performance: 76 }
+                };
+                
+                document.getElementById('attendance-rate').textContent = stats[period].attendance + '%';
+                document.getElementById('at-risk').textContent = stats[period].atRisk;
+                document.getElementById('avg-performance').textContent = stats[period].performance + '%';
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === loginModal) {
+                    closeLoginModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
